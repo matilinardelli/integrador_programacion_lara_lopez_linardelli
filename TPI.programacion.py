@@ -320,3 +320,146 @@ def estadisticas(pais, poblacion,superficie,continente):
  
     for continente, cantidad in conteo_por_continente.items():
         print(f"  {continente}: {cantidad}")
+
+#===================================================================
+# menu del 2 al 7
+#===================================================================
+
+def cargar_paises(ruta_archivo):
+    """Carga los países desde el CSV a una lista de diccionarios."""
+    paises = []
+    with open(ruta_archivo, mode="r", encoding="utf-8") as archivo:
+        lector = csv.DictReader(archivo)
+        for fila in lector:
+            paises.append({
+                "nombre": fila["nombre"].strip(),
+                "poblacion": int(fila["poblacion"]),
+                "superficie": int(fila["superficie"]),
+                "continente": fila["continente"].strip()
+            })
+    return paises
+
+
+def guardar_paises(ruta_archivo, paises):
+    """Sobrescribe el archivo CSV con la lista actualizada de países."""
+    campos = ["nombre", "poblacion", "superficie", "continente"]
+    with open(ruta_archivo, mode="w", encoding="utf-8", newline="") as archivo:
+        escritor = csv.DictWriter(archivo, fieldnames=campos)
+        escritor.writeheader()
+        escritor.writerows(paises)
+
+
+# --- FUNCIONES AUXILIARES ---
+
+def buscar_pais_exacto(paises, nombre_buscado):
+    """Devuelve el diccionario del país si coincide exactamente, o None."""
+    termino = nombre_buscado.strip().lower()
+    for pais in paises:
+        if termino == pais["nombre"].lower():
+            return pais
+    return None
+
+
+def buscar_paises_parcial(paises, nombre_buscado):
+    """Devuelve una lista de países que contengan el texto buscado."""
+    termino = nombre_buscado.strip().lower()
+    resultados = []
+    for pais in paises:
+        if termino in pais["nombre"].lower():
+            resultados.append(pais)
+    return resultados
+
+
+# --- OPCIONES DEL MENÚ ---
+
+def actualizar_pais(paises):
+    """Opción 2: actualiza población y superficie, y guarda los cambios en el CSV."""
+    nombre = input("Nombre del país a actualizar: ")
+    pais = buscar_pais_exacto(paises, nombre)
+    
+    if pais is None:
+        print(f"Error: '{nombre.strip()}' no está en el catálogo.")
+        return
+        
+    print(f"'{pais['nombre']}' tiene {pais['poblacion']} de población y {pais['superficie']} km² de superficie.")
+    
+    pais["poblacion"] = int(input("Nueva población: "))
+    pais["superficie"] = int(input("Nueva superficie: "))
+    
+    guardar_paises(RUTA_CSV, paises)
+    print(f"Datos actualizados y guardados en {RUTA_CSV} para '{pais['nombre']}'.")
+
+
+def consultar_pais(paises):
+    """Opción 3: busca un país por nombre (parcial o exacto) y muestra sus datos."""
+    nombre = input("Nombre del país a buscar: ")
+    resultados = buscar_paises_parcial(paises, nombre)
+    
+    print(f"\nSe encontraron {len(resultados)} resultado(s):")
+    for pais in resultados:
+        print(
+            f"- {pais['nombre']} | Población: {pais['poblacion']} | "
+            f"Superficie: {pais['superficie']} km² | Continente: {pais['continente']}"
+        )
+
+
+def filtrar_por_continente(paises):
+    """Opción 4: filtra y muestra los países que pertenecen a un continente."""
+    continente_buscado = input("Continente a filtrar: ").strip().lower()
+    
+    print(f"\nPaíses en el continente '{continente_buscado}':")
+    for pais in paises:
+        if continente_buscado in pais["continente"].lower():
+            print(f"- {pais['nombre']} | Continente: {pais['continente']}")
+
+
+def filtrar_por_poblacion(paises):
+    """Opción 5: filtra y muestra los países dentro de un rango de población."""
+    min_poblacion = int(input("Población mínima: "))
+    max_poblacion = int(input("Población máxima: "))
+    
+    print(f"\nPaíses con población entre {min_poblacion} y {max_poblacion}:")
+    for pais in paises:
+        if min_poblacion <= pais["poblacion"] <= max_poblacion:
+            print(f"- {pais['nombre']} | Población: {pais['poblacion']}")
+
+
+def filtrar_por_superficie(paises):
+    """Opción 6: filtra y muestra los países dentro de un rango de superficie."""
+    min_superficie = int(input("Superficie mínima (km²): "))
+    max_superficie = int(input("Superficie máxima (km²): "))
+    
+    print(f"\nPaíses con superficie entre {min_superficie} y {max_superficie} km²:")
+    for pais in paises:
+        if min_superficie <= pais["superficie"] <= max_superficie:
+            print(f"- {pais['nombre']} | Superficie: {pais['superficie']} km²")
+
+
+def ordenar_paises(paises):
+    """Opción 7: ordena y muestra los países por nombre, población o superficie."""
+    print("\n--- CRITERIO DE ORDENAMIENTO ---")
+    print("a) Nombre")
+    print("b) Población")
+    print("c) Superficie")
+    criterio = input("Elija una opción: ").strip().lower()
+    
+    orden = input("Sentido: a) Ascendente  b) Descendente: ").strip().lower()
+    descendente = (orden == "b")
+
+    match criterio:
+        case "a":
+            ordenados = sorted(paises, key=lambda p: p["nombre"].lower(), reverse=descendente)
+        case "b":
+            ordenados = sorted(paises, key=lambda p: p["poblacion"], reverse=descendente)
+        case "c":
+            ordenados = sorted(paises, key=lambda p: p["superficie"], reverse=descendente)
+        case _:
+            print("Opción inválida.")
+            return
+
+    print("\nResultados ordenados:")
+    for pais in ordenados:
+        print(
+            f"- {pais['nombre']} | Población: {pais['poblacion']} | "
+            f"Superficie: {pais['superficie']} km² | Continente: {pais['continente']}"
+        )
