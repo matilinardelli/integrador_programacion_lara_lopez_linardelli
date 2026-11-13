@@ -273,3 +273,50 @@ def actualizar_poblacion_superficie(paises):
     pais_encontrado["poblacion"] = poblacion_num
     pais_encontrado["superficie"] = superficie_num
     print(f"Datos de '{pais_encontrado['nombre']}' actualizados con éxito.")
+
+
+# ============================================================
+# CARGA INICIAL
+# ===========================================================
+def agregar_pais(pais, poblacion,superficie,continente):
+    cantidad_carga = int(input("Cantidad de paises que desea cargar: "))
+    while cantidad_carga > 0:
+        for i in range(1, cantidad_carga + 1):
+            nom_pais = input("Ingrese el nombre del país: ")
+            cant_poblacion = int(input("Ingrese la cantidad de poblacion: "))
+            num_superficie = int(input("Ingrese la superficie en km:" ))
+            nom_continente = input("Ingrese el continente del pais: ")
+
+            pais.append(nom_pais)
+            poblacion.append(cant_poblacion)
+            superficie.append(num_superficie)
+            continente.append(nom_continente)
+            return pais, poblacion,superficie,continente
+
+# ============================================================
+# ESTRADISTICAS
+# ===========================================================
+def estadisticas(pais, poblacion,superficie,continente):
+    print("\n--- Estadísticas ---")
+    if not paises:
+        print("No hay países cargados todavía.")
+        return
+ 
+    mayor_poblacion = max(paises, key=lambda pais: pais["poblacion"])
+    menor_poblacion = min(paises, key=lambda pais: pais["poblacion"])
+    promedio_poblacion = sum(pais["poblacion"] for pais in paises) / len(paises)
+    promedio_superficie = sum(pais["superficie"] for pais in paises) / len(paises)
+ 
+    print(f"País con mayor población: {mayor_poblacion['nombre']} ({mayor_poblacion['poblacion']:,} hab.)")
+    print(f"País con menor población: {menor_poblacion['nombre']} ({menor_poblacion['poblacion']:,} hab.)")
+    print(f"Promedio de población: {promedio_poblacion:,.2f} hab.")
+    print(f"Promedio de superficie: {promedio_superficie:,.2f} km2")
+ 
+    print("\nCantidad de países por continente:")
+    conteo_por_continente = {}
+    for pais in paises:
+        continente = pais["continente"]
+        conteo_por_continente[continente] = conteo_por_continente.get(continente, 0) + 1
+ 
+    for continente, cantidad in conteo_por_continente.items():
+        print(f"  {continente}: {cantidad}")
