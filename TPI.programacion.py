@@ -2,9 +2,9 @@ import csv
 
 RUTA_CSV = "paises.csv"
 COLUMNAS_CSV = ["nombre", "continente", "poblacion", "superficie"]
-CONTINENTES_VALIDOS = {"America", "Africa", "Asia", "Europa", "Oceania", "Antartida"}
+CONTINENTES_VALIDOS = {"América", "Africa", "Asia", "Europa", "Oceania", "Antartida"}
 CONTINENTES_OPCIONES = {
-    "1": "America",
+    "1": "América",
     "2": "Africa",
     "3": "Asia",
     "4": "Europa",
@@ -155,6 +155,10 @@ def validar_fila_csv(fila, numero_fila):
     ]
     if campos_vacios:
         return False, f"Fila {numero_fila}: faltan datos en {', '.join(campos_vacios)}."
+
+    es_valido, resultado = validar_continente(fila["continente"])
+    if not es_valido:
+        return False, f"Fila {numero_fila}: {resultado}"
 
     es_valido, resultado = validar_numero_positivo(fila["poblacion"], "Población")
     if not es_valido:
