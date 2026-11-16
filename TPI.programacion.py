@@ -36,9 +36,9 @@ def validar_continente(continente):
 
 def validar_numero_positivo(valor, nombre_campo):
     """
-    Controla que un valor (población o superficie) sea numérico y
-    mayor a 0. Si es válido, devuelve el número ya convertido a float
-    (listo para usar), en vez del mensaje vacío.
+    Controla que un valor sea numérico y
+    mayor a 0. Si es válido, devuelve el número ya convertido a float 
+    en vez del mensaje vacío.
     """
     try:
         numero = float(valor)
@@ -54,8 +54,7 @@ def validar_numero_positivo(valor, nombre_campo):
 def validar_pais_nuevo(nombre, continente, poblacion, superficie):
     """
     Validación completa para agregar un país nuevo. Devuelve
-    (True, diccionario_pais) si todo está bien, o (False, mensaje)
-    apenas encuentra el primer error.
+    si todo está bien, o apenas encuentra el primer error.
     """
     es_valido, mensaje = validar_campo_no_vacio(nombre, "Nombre")
     if not es_valido:
@@ -76,8 +75,8 @@ def validar_pais_nuevo(nombre, continente, poblacion, superficie):
     superficie_num = resultado
 
     pais = {
-        "nombre": nombre.strip(),
-        "continente": continente.strip().title(),
+        "nombre": nombre.strip().capitalize(),
+        "continente": continente.strip().capitalize(),
         "poblacion": int(poblacion_num),
         "superficie": superficie_num
     }
@@ -98,7 +97,7 @@ def validar_actualizacion(poblacion_nueva, superficie_nueva):
 
 
 def validar_rango(minimo, maximo, nombre_campo):
-    """Controla un rango numérico (para filtrar por población o superficie)."""
+    """Controla un rango numérico."""
     try:
         min_num = float(minimo)
         max_num = float(maximo)
@@ -160,10 +159,9 @@ def validar_fila_csv(fila, numero_fila):
 
 def leer_paises_desde_csv(ruta_archivo):
     """
-    Lee el CSV completo y devuelve (lista_paises, lista_errores).
+    Lee el CSV completo y devuelve
     Las filas inválidas se descartan una por una sin frenar la carga
-    del resto, y los problemas graves (archivo faltante, encabezado
-    incompleto) se informan sin romper el programa.
+    del resto, y los problemas graves se informan sin romper el programa.
     """
     paises = []
     errores = []
@@ -184,8 +182,8 @@ def leer_paises_desde_csv(ruta_archivo):
                     continue
 
                 pais = {
-                    "nombre": fila["nombre"].strip(),
-                    "continente": fila["continente"].strip().title(),
+                    "nombre": fila["nombre"].strip().capitalize(),
+                    "continente": fila["continente"].strip().capitalize(),
                     "poblacion": int(float(fila["poblacion"])),
                     "superficie": float(fila["superficie"])
                 }
@@ -325,7 +323,7 @@ def buscar_paises_parcial(paises, nombre_buscado):
 # ===========================================================
 
 def consultar_pais(paises):
-    """Opción 3: busca un país por nombre (aproximado) y muestra sus datos."""
+    """Opción 3: busca un país por nombre y muestra sus datos."""
     print("\n--- Consultar país ---")
     nombre = input("Nombre del país a buscar: ")
     resultados = buscar_paises_parcial(paises, nombre)
