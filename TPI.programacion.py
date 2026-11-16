@@ -3,7 +3,14 @@ import csv
 RUTA_CSV = "paises.csv"
 COLUMNAS_CSV = ["nombre", "continente", "poblacion", "superficie"]
 CONTINENTES_VALIDOS = {"America", "Africa", "Asia", "Europa", "Oceania", "Antartida"}
-
+CONTINENTES_OPCIONES = {
+    "1": "America",
+    "2": "Africa",
+    "3": "Asia",
+    "4": "Europa",
+    "5": "Oceania",
+    "6": "Antartida"
+}
 
 # ============================================================
 # VALIDACIONES
@@ -32,6 +39,13 @@ def validar_continente(continente):
             f"Opciones: {', '.join(sorted(CONTINENTES_VALIDOS))}."
         )
     return True, ""
+
+def validar_opcion_continente(opcion):
+    """Controla que la opción elegida (1-6) corresponda a un continente."""
+    opcion = opcion.strip()
+    if opcion not in CONTINENTES_OPCIONES:
+        return False, f"'{opcion}' no es una opción válida. Elija un número del 1 al 6."
+    return True, CONTINENTES_OPCIONES[opcion]
 
 
 def validar_numero_positivo(valor, nombre_campo):
@@ -219,10 +233,19 @@ def agregar_pais(paises):
     """Pide los datos de un país nuevo por teclado, lo valida y lo agrega a la lista."""
     print("\n--- Agregar país ---")
     nombre = input("Nombre: ")
-    continente = input("Continente (America/Africa/Asia/Europa/Oceania/Antartida): ")
+    print("Continente:")
+    for numero, nombre_continente in CONTINENTES_OPCIONES.items():
+        print(f"  {numero}. {nombre_continente}")
+    opcion_continente = input("Elija una opción (1-6): ")
+
+    es_valido, resultado = validar_opcion_continente(opcion_continente)
+    if not es_valido:
+        print(f"Error: {resultado}")
+        return
+    continente = resultado
+
     poblacion = input("Población: ")
     superficie = input("Superficie (km2): ")
-
     es_valido, resultado = validar_pais_nuevo(nombre, continente, poblacion, superficie)
     if not es_valido:
         print(f"Error: {resultado}")
@@ -266,6 +289,33 @@ def actualizar_poblacion_superficie(paises):
     pais_encontrado["superficie"] = superficie_num
     guardar_paises(RUTA_CSV, paises)  # Guardado automático
     print(f"Datos de '{pais_encontrado['nombre']}' actualizados y guardados en CSV.")
+
+
+def eliminar_pais(paises):
+    """Busca un país por nombre exacto, pide confirmación y lo elimina."""
+    print("\n--- Eliminar país ---")
+    nombre = input("Nombre exacto del país a eliminar: ").strip()
+
+    pais_encontrado = None
+    for pais in paises:
+        if pais["nombre"].lower() == nombre.lower():
+            pais_encontrado = pais
+            break
+
+    if pais_encontrado is None:
+        print(f"Error: no se encontró ningún país llamado '{nombre}'.")
+        return
+
+    confirmacion = input(
+        f"¿Seguro que desea eliminar '{pais_encontrado['nombre']}'? (s/n): "
+    ).strip().lower()
+    if confirmacion != "s":
+        print("Operación cancelada.")
+        return
+
+    paises.remove(pais_encontrado)
+    guardar_paises(RUTA_CSV, paises)  # Guardado automático
+    print(f"País '{pais_encontrado['nombre']}' eliminado y cambios guardados en CSV.")
 
 
 # ============================================================
@@ -484,19 +534,20 @@ def mostrar_menu():
     print("6. Filtrar por rango de superficie")
     print("7. Ordenar países")
     print("8. Ver estadísticas")
-    print("9. Guardar cambios y Salir")
+    print("9. Eliminar pais.")
+    print("10. Guardar cambios y Salir")
 
 
 def main():
     paises, errores = leer_paises_desde_csv(RUTA_CSV)
     if errores:
-        print("⚠️ Avisos al iniciar con el archivo CSV:")
+        print("Avisos al iniciar con el archivo CSV:")
         for error in errores:
             print(f"  - {error}")
 
     while True:
         mostrar_menu()
-        opcion = input("Seleccione una opción (1-9): ").strip()
+        opcion = input("Seleccione una opción (1-10): ").strip()
 
         match opcion:
             case "1":
@@ -516,11 +567,13 @@ def main():
             case "8":
                 estadisticas(paises)
             case "9":
+                eliminar_pais(paises)
+            case "10":    
                 guardar_paises(RUTA_CSV, paises)
                 print("Datos guardados en CSV. ¡Hasta luego!")
                 break
             case _:
-                print("Opción inválida. Por favor, ingrese un número del 1 al 9.")
+                print("Opción inválida. Por favor, ingrese un número del 1 al 10.")
 
 
 if __name__ == "__main__":
